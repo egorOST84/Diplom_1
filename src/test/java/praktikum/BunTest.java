@@ -1,37 +1,24 @@
 package praktikum;
 
-import com.github.javafaker.Faker;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.Random;
 
 import static org.junit.Assert.*;
 
 public class BunTest {
-    private static Faker faker;
 
+    private static Bun bun;
     @BeforeClass
     public static void setup() {
-        faker = new Faker();
+        bun = new Bun("Bun with seeds", 1.5f);
     }
     @Test
-    public void checkGetNameReturnsName() {
-        Bun bun = createRandomBun();
-        String expectedName = bun.getName();
-        assertEquals(expectedName, bun.getName());
+    public void testGetNameReturnsExpectedName() {
+        assertEquals("Bun with seeds", bun.getName());
     }
 
     @Test
-    public void checkGetPriceReturnsPrice() {
-        Bun bun = createRandomBun();
-        float expectedPrice = bun.getPrice();
-        assertEquals(expectedPrice, bun.getPrice(), 0.01);
-    }
-
-    public Bun createRandomBun() {
-        float price = new Random().nextFloat();
-        String name = "Bun with " + faker.food().fruit().toLowerCase();
-        return new Bun(name, price);
+    public void testGetPriceReturnsExpectedPrice() {
+        assertEquals(1.5f, bun.getPrice(), 0.001f);
     }
 }
