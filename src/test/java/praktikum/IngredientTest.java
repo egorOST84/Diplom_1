@@ -33,14 +33,15 @@ public class IngredientTest {
 
     @Mock
     IngredientType type;
+
     @Before
-    public void setUp() {
+    public void setUpAndInit() {
         MockitoAnnotations.openMocks(this);
         ingredient = new Ingredient(type, name, price);
     }
 
     @Test
-    public void getPrice() {
+    public void testGetPriceReturnsExpectedPrice() {
         assertEquals(name, ingredient.getName());
     }
 
@@ -50,7 +51,7 @@ public class IngredientTest {
     }
 
     @Test
-    public void getType() {
+    public void testGetTypeWithMockedIngredientType() {
         assertEquals(type, ingredient.getType());
     }
 }
