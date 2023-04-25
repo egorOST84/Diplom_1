@@ -90,6 +90,20 @@ public class BurgerTest {
     }
 
     @Test
+    public void testGetReceiptContainsIngredients() {
+        // Добавляем булочку в бургер
+        burger.setBuns(bun);
+        // Добавляем ингредиенты
+        burger.addIngredient(filling);
+        burger.addIngredient(sauce);
+        // Получаем рецепт бургера и сохраняем в переменную
+        receipt = burger.getReceipt();
+        // Проверяем, что в рецепте есть стоимость ингридиенты
+        assertTrue(receipt.contains(String.format("= %s %s =%n", sauce.getType().toString().toLowerCase(), sauce.getName())));
+        assertTrue(receipt.contains(String.format("= %s %s =%n", filling.getType().toString().toLowerCase(), filling.getName())));
+    }
+
+    @Test
     public void testGetReceiptContainsPrice() {
         // Добавляем булочку в бургер
         burger.setBuns(bun);
