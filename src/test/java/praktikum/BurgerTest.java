@@ -24,7 +24,7 @@ public class BurgerTest {
     }
 
     @Before
-    public void createBurger() {
+    public void initBurger() {
         burger = new Burger();
     }
 
