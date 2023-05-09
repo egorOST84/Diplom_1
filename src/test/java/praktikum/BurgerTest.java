@@ -1,120 +1,107 @@
 package praktikum;
 
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class BurgerTest {
     private Burger burger;
-    private static Bun bun;
-    private static Ingredient filling;
-    private static Ingredient sauce;
-    private String receipt;
-
-    @BeforeClass
-    public static void setUp() {
-        // Создаем булочку для тестирования
-        bun = new Bun("Bun with seeds", 1.5f);
-        // Создаем ингредиенты для тестирования
-        filling = new Ingredient(IngredientType.FILLING, "Filling", 0.5f);
-        sauce = new Ingredient(IngredientType.SAUCE, "Sauce", 0.25f);
-    }
+    @Mock
+    private Bun bun;
+    @Mock
+    private Ingredient ingredient1;
+    @Mock
+    private Ingredient ingredient2;
 
     @Before
-    public void initBurger() {
+    public void setUp() {
         burger = new Burger();
+
+        when(ingredient1.getName()).thenReturn("Beef cutlet");
+        when(ingredient1.getPrice()).thenReturn(1.25f);
+        when(ingredient1.getType()).thenReturn(IngredientType.FILLING);
+
+        when(ingredient2.getName()).thenReturn("Ketchup");
+        when(ingredient2.getPrice()).thenReturn(0.3f);
+        when(ingredient2.getType()).thenReturn(IngredientType.SAUCE);
+
+        when(bun.getName()).thenReturn("Test bun");
+        when(bun.getPrice()).thenReturn(0.75f);
     }
 
     @Test
     public void testSetBunsSetsBun() {
-        // Добавляем булочку в бургер
-        burger.setBuns(bun);
-        // Проверяем, что поле bun типа Bun в бургере равно созданному тестовому объекту bun
-        assertNotNull(burger.bun);
+        Bun bunStubbed = new Bun(bun.getName(), bun.getPrice());
+        burger.setBuns(bunStubbed);
+        assertEquals(bun.getName(), burger.bun.name);
+        assertEquals(bun.getPrice(), burger.bun.price, 0.001f);
     }
 
     @Test
-    public void testAddIngredientAddsMockIngredient() {
-        // Добавляем ингредиент
-        burger.addIngredient(filling);
-        // Проверяем, что ингредиент добавлен в список ингредиентов бургера
-        Assert.assertEquals(filling, burger.ingredients.get(0));
+    public void testAddIngredientAddsIngredient() {
+        Ingredient ingredientStubbed = new Ingredient(ingredient1.getType(), ingredient1.getName(), ingredient1.getPrice());
+        burger.addIngredient(ingredientStubbed);
+        assertEquals(ingredient1.getName(), burger.ingredients.get(0).name);
+        assertEquals(ingredient1.getPrice(), burger.ingredients.get(0).price, 0.001f);
     }
 
     @Test
     public void testRemoveIngredientFromListOfIngredientsByIndex() {
-        // Добавляем ингредиенты
-        burger.addIngredient(filling);
-        burger.addIngredient(sauce);
-        // Вызываем метод removeIngredient, передавая ему индекс удаляемого ингредиента
+        burger.addIngredient(ingredient1);
+        burger.addIngredient(ingredient2);
         burger.removeIngredient(0);
-        // Проверяем, что ингредиент удален из списка ингредиентов бургера
-        assertFalse(burger.ingredients.contains(filling));
-        // Проверяем, что размер списка равен 1 после удаления
-        assertEquals(1, burger.ingredients.size());
+        assertFalse(burger.ingredients.contains(ingredient1));
+        assertThat(burger.ingredients, hasSize(1));
     }
 
     @Test
     public void testMoveIngredientToAnotherPlaceInIngredientsList() {
-        // Добавляем ингредиенты
-        burger.addIngredient(filling);
-        burger.addIngredient(sauce);
-        // Вызываем метод moveIngredient, передавая ему индекс удаляемого ингредиента
+        burger.addIngredient(ingredient1);
+        burger.addIngredient(ingredient2);
         burger.moveIngredient(0, 1);
-        // / Проверяем, что метод изменился индекс ингредиента с 0 на 1 в списке ингредиентов бургера
-        assertEquals(1, burger.ingredients.indexOf(filling));
+        assertEquals(1, burger.ingredients.indexOf(ingredient1));
     }
 
     @Test
     public void testGetPriceReturnsBunDoubledPricePlusAllIngredientsPrice() {
-        // Вычисляем ожидаемую стоимость
-        float expectedPrice = bun.getPrice() * 2 + filling.getPrice() + sauce.getPrice();
-        // Добавляем булочку в бургер
+        float expectedPrice = bun.getPrice() * 2 + ingredient1.getPrice() + ingredient2.getPrice();
         burger.setBuns(bun);
-        // Добавляем ингредиенты
-        burger.addIngredient(filling);
-        burger.addIngredient(sauce);
-        // Проверяем, что метод getPrice() возвращает (bun.getPrice() * 2) + сумма всех ингредиентов
+        burger.addIngredient(ingredient1);
+        burger.addIngredient(ingredient2);
         assertEquals(expectedPrice, burger.getPrice(), 0.001f);
     }
 
     @Test
     public void testGetReceiptContainsBunName() {
-        // Добавляем булочку в бургер
         burger.setBuns(bun);
-        // Получаем рецепт бургера и сохраняем в переменную
-        receipt = burger.getReceipt();
-        // Проверяем, что в рецепте есть название булочки
-        assertTrue(receipt.contains(String.format("(==== %s ====)%n", bun.getName())));
+        assertTrue(burger.getReceipt().contains(String.format("(==== %s ====)%n", bun.getName())));
     }
 
     @Test
     public void testGetReceiptContainsIngredients() {
-        // Добавляем булочку в бургер
         burger.setBuns(bun);
-        // Добавляем ингредиенты
-        burger.addIngredient(filling);
-        burger.addIngredient(sauce);
-        // Получаем рецепт бургера и сохраняем в переменную
-        receipt = burger.getReceipt();
-        // Проверяем, что в рецепте есть стоимость ингредиенты
-        assertTrue(receipt.contains(String.format("= %s %s =%n", sauce.getType().toString().toLowerCase(), sauce.getName())));
-        assertTrue(receipt.contains(String.format("= %s %s =%n", filling.getType().toString().toLowerCase(), filling.getName())));
+        burger.addIngredient(ingredient1);
+        burger.addIngredient(ingredient2);
+        String receipt = burger.getReceipt();
+
+        String ingredient1String = String.format("= %s %s =", ingredient1.getType().toString().toLowerCase(), ingredient1.getName());
+        String ingredient2String = String.format("= %s %s =", ingredient2.getType().toString().toLowerCase(), ingredient2.getName());
+
+        assertTrue(receipt.contains(ingredient1String) && receipt.contains(ingredient2String));
     }
 
     @Test
     public void testGetReceiptContainsPrice() {
-        // Добавляем булочку в бургер
         burger.setBuns(bun);
-        // Добавляем ингредиенты
-        burger.addIngredient(filling);
-        burger.addIngredient(sauce);
-        // Получаем рецепт бургера и сохраняем в переменную
-        receipt = burger.getReceipt();
-        // Проверяем, что в рецепте есть стоимость бургера (булочка с ингредиентами)
-        assertTrue(receipt.contains(String.format("%nPrice: %f%n", burger.getPrice())));
+        burger.addIngredient(ingredient1);
+        burger.addIngredient(ingredient2);
+        assertTrue(burger.getReceipt().contains(String.format("%nPrice: %f%n", burger.getPrice())));
     }
 }
